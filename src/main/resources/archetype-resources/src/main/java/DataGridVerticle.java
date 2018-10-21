@@ -1,5 +1,7 @@
 package ${package};
 
+import ${package}.model.${dataObjectClassName};
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -34,19 +36,19 @@ public class DataGridVerticle<K, V> extends AbstractVerticle {
     public static String HTTP_SERVER_PORT = HTTP_SERVER + ".port";
 
     protected RemoteCacheManager manager;
-    protected RemoteCache<String, SimpleDataObject> cache;
+    protected RemoteCache<String, ${dataObjectClassName}> cache;
 
     @Override
     public void start(Future<Void> startFuture) throws Exception {
         LOGGER.info("Vertx uses LOGGER: " + LOGGER + ", LoggerDelegate is " + LOGGER.getDelegate());
         LOGGER.debug("DEBUG: Vertx uses LOGGER: " + LOGGER + ", LoggerDelegate is " + LOGGER.getDelegate());
-        vertx.<RemoteCache<String, SimpleDataObject>>executeBlocking(future -> {
+        vertx.<RemoteCache<String, ${dataObjectClassName}>>executeBlocking(future -> {
             Configuration managerConfig = getCacheManagerConfiguration();
             manager = new RemoteCacheManager(managerConfig);
             LOGGER.info("Created RemoteCacheManger=" + manager);
             final String cacheName = config().getString("cache-name");
             LOGGER.debug("Trying to get cache: " + cacheName);
-            RemoteCache<String, SimpleDataObject> newCache = manager.getCache(cacheName);
+            RemoteCache<String, ${dataObjectClassName}> newCache = manager.getCache(cacheName);
             LOGGER.debug("Got reference for RemoteCahe=" + newCache);
             future.complete(newCache);
         }, result -> {
@@ -149,7 +151,7 @@ public class DataGridVerticle<K, V> extends AbstractVerticle {
     protected void addSDO(RoutingContext rc) {
         JsonObject o = rc.getBodyAsJson();
         LOGGER.debug("POST reuest for OBJECT: " + o);
-        SimpleDataObject sdo = new SimpleDataObject(o);
+        ${dataObjectClassName} sdo = new ${dataObjectClassName}(o);
         final String id = sdo.getId();
         cache.putAsync(id, sdo).whenComplete((result, th) -> {
             LOGGER.info("Cache put request for id=" + id + " completed with result: " + result);
@@ -166,7 +168,7 @@ public class DataGridVerticle<K, V> extends AbstractVerticle {
         final String id = rc.request().getParam("id");
         JsonObject o = rc.getBodyAsJson();
         LOGGER.debug("UPDATE request for OBJECT: " + o + " with id: " + id);
-        SimpleDataObject sdo = new SimpleDataObject(o);
+        ${dataObjectClassName} sdo = new ${dataObjectClassName}(o);
         cache.replaceAsync(id, sdo).whenComplete((result, th) -> {
             LOGGER.info("Cache update request for id=" + id + " completed with result: " + result);
             if (th != null) {
@@ -195,23 +197,6 @@ public class DataGridVerticle<K, V> extends AbstractVerticle {
         rc.response().putHeader("rc-type", "text/html").setStatusCode(HttpResponseStatus.OK.code())
                 .end("<html><body>OK/</body></html>\n");
 
-    }
-
-    protected SimpleDataObject getSimpleDataObject(String id) {
-        return cache.get(id);
-    }
-
-    protected SimpleDataObject createSimpleDataObject(SimpleDataObject dto) {
-        // https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html#putIfAbsent-K-V-
-        return cache.putIfAbsent(dto.getId(), dto);
-    }
-
-    protected SimpleDataObject updateSimpleDataObject(SimpleDataObject dto) {
-        return cache.replace(dto.getId(), dto);
-    }
-
-    protected boolean removeSimpleDataObject(SimpleDataObject dto) {
-        return cache.remove(dto.getId(), dto);
     }
 
     protected Configuration getCacheManagerConfiguration() {

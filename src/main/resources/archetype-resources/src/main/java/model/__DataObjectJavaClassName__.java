@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.codegen.annotations.DataObject;
 
 @DataObject(generateConverter = true)
-public class SimpleDataObject implements AbstractDataObject {
+public class ${dataObjectClassName} implements AbstractDataObject {
 
     @SuppressWarnings("unused")
     private static final long serialVersionUID = 1;
@@ -16,25 +16,25 @@ public class SimpleDataObject implements AbstractDataObject {
     private String name;
     private String otherReference;
 
-    public SimpleDataObject() {
+    public ${dataObjectClassName}() {
         this.id = defaultId();
         this.name = "default name for: " + id.toString();
         this.otherReference = null;
     }
 
-    public SimpleDataObject(SimpleDataObject other) {
+    public ${dataObjectClassName}(${dataObjectClassName} other) {
         this.id = other.id;
         this.name = other.name;
         this.otherReference = other.otherReference;
     }
 
-    public SimpleDataObject(String id, String name, String ref) {
+    public ${dataObjectClassName}(String id, String name, String ref) {
         this.id = id;
         this.name = name;
         this.otherReference = ref;
     }
 
-    public SimpleDataObject(JsonObject json) {
+    public ${dataObjectClassName}(JsonObject json) {
         SimpleDataObjectConverter.fromJson(json, this);
     }
 
@@ -71,7 +71,7 @@ public class SimpleDataObject implements AbstractDataObject {
 
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
-        SimpleDataObjectConverter.toJson(this, json);
+        ${dataObjectClassName}Converter.toJson(this, json);
         return json;
     }
 
@@ -87,10 +87,10 @@ public class SimpleDataObject implements AbstractDataObject {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof SimpleDataObject)) {
+        if (!(o instanceof ${dataObjectClassName})) {
             return false;
         }
-        final SimpleDataObject sdo = (SimpleDataObject) o;
+        final ${dataObjectClassName} sdo = (${dataObjectClassName}) o;
         if (getId().equals(sdo.getId()) == false) {
             return false;
         }
