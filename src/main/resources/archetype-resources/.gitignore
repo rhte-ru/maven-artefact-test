@@ -2,6 +2,7 @@
 .project
 .settings
 .vscode
+bin
 target
 **/asciidoc/**
 **/generated/**
